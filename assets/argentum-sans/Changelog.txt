@@ -1,0 +1,198 @@
+Changelog prior to Argentum Sans, v2.0 fork
+
+### Version 3.100
+- Now with four set of figures: tabular lining (default), tabular oldstyle, proportional lining, proportional oldstyle.
+- fixed kcommaaccent (ķ) accent positioning (thanks @kalapi).
+- Deleted some open paths in .glyphs files.
+
+### Version 4.000
+- Updated character-set/language support to Google's Pro glyph-set (https://github.com/google/fonts/tree/master/tools/encodings/GF%202016%20Glyph%20Sets)
+- Updated OS/2 winMetrics to Google's latest vertical metrics recommendations (https://groups.google.com/d/msg/googlefonts-discuss/W4PHxnLk3JY/KoMyM2CfAwAJ)
+- Added 'useTypoMetrics' flag
+- Added OpenType features consistent with character-set expansion
+
+Changelog of Argentum Sans, v2.0 (in no particular order):
+
+- Re-worked vertical metrics
+- Subsetted to 782 glyph-set (including all Latin, Extended, and Vietnamese)
+- Changed to Tabularized numerals
+- Added a crossbar 'G' by @green-s (https://github.com/green-s/Montserrat-G)
+- Added a tailed 'l' from alternate glyphs
+- Fixed adieresismacron and guaranisign (so this one matches the G)
+- Added percent and perthousand from Montserrat, version 6.002 (more narrower), and re-done spacing of both
+- Fixed 'G' on italics, so they feel more italicized, rather than obliqued
+
+Changelog of Argentum Sans, v2.7 (in no particular order):
+
+- Added mention to me (Cristiano Sobral) in copyright notes in all weights
+- Streamlined vertical metrics in all weights
+- Recomposed basic OpenType features
+- Adapted kerning to tabular figures in all roman weights
+- Imported Cyrillic support from Montserrat, version 7.2
+- Modified 'Q' to straight-tailed
+- Flattened caps-height (to be exactly 70 percent of em-size)
+- Upscaled UPM to 2000
+
+Changelog of Argentum Sans, v2.8 (in no particular order):
+- Slightly condensed tracking in lowercase Italic
+
+Changelog of Argentum Sans, v2.10 (in no particular order):
+- True forms for 'e' and 'f' in Italic
+
+Changelog of Argentum Sans, v2.12 (in no particular order):
+- Some fixes in ae/oe
+- Slightly changed spacing in all 'e'-related glyphs in Italic
+
+Changelog of Argentum Sans, v2.14 (in no particular order):
+- Adjusted G overshoot in many weights
+- Rebuilt composite glyphs in Thin/ThinItalic
+- Made f/t crossbars match x-height
+
+Changelog of Argentum Sans, v2.16 (in no particular order):
+- Some bug fixes (including Aring/aring)
+- Added colonmod (U+A789)
+
+Changelog of Argentum Sans, v2.18 (in no particular order):
+- Made 'Q' display-friendly (by changing it to crossing,
+  but not descending below the baseline)
+- Fixed copyright notes (so it matches OFL.txt in Github)
+- Adjusted left kerning in G-related glyphs in Italic
+- Fixed greaterequal in several Italic weights
+- Fixed some accents in Italic
+
+Changelog of Argentum Sans, v3.0 (in no particular order):
+- Upgraded to variable font
+
+Changelog of Argentum Sans, v3.2 (in no particular order):
+- Reduced some more tracking in Italic
+
+Changelog of Argentum Sans, v3.4 (in no particular order):
+- Adjusted kerning of upper/lowercase k/v/w/x/y
+- Adjusted G crossbar in Italic
+- Redrawn 0 (all forms) in Italic
+
+Changelog of Argentum Sans, v3.6 (in no particular order):
+- Re-imported Cyrillic forms from Montserrat v7.2
+- Redrawn S in Italic
+
+Changelog of Argentum Sans, v3.8 (in no particular order):
+- Removed serif in 1.tf and 1.tosf
+
+Changelog of Argentum Sans, v3.9 (in no particular order):
+- Redrawn G in Italic
+
+Changelog of Argentum Sans, v3.11 (in no particular order):
+- Reverted back to tabular figures as default (as of prior
+  to version 3.0)
+- Re-adjusted spacing and kerning to tabular figures
+- Fixed dieresis on i (for Ukrainian language), later undone
+
+Changelog of Argentum Sans, v3.13 (in no particular order):
+- Added ligature for double I/idieresis
+- Widened G crossbar (both Roman and Italic)
+- Fixes in wonsign, naira, and peso
+
+Changelog of Argentum Sans, v3.14 (in no particular order):
+- Added mark and mkmk features
+- Some fixes in 1 and Q
+
+Changelog of Argentum Sans, v3.16 (in no particular order):
+- Some fixes on Q
+- Standalone otf files
+- Ported webfonts script to Python
+
+Changelog of Argentum Sans, v3.17 (in no particular order):
+- Some fixes on Q
+- Fixes overlapping characters in Cyrillic
+- Reduced contrast in G
+
+Changelog of Argentum Sans, v3.100 (in no particular order):
+- Imported Greek support from Montserrat-Z-Remix
+  (https://github.com/AndreasZorpidis/Montserrat-Z-Remix)
+
+Changelog of Argentum Sans, v3.101 to v3.103 (in no particular order):
+- Changed question mark
+
+Changelog of Argentum Sans, v3.110 to v3.111 (in no particular order):
+- Some adjusts in spaces
+- MAJOR 1: Upscaled eM size to 2000
+- MAJOR 2: Changed 'a' to double-storey in Italic only
+- MAJOR 3: Synced horizontal metrics from Roman to Italic.
+  As a result, Argentum Sans now has multiplexed posture,
+  but Roman and Italic sources are still independent
+  
+Changelog of Argentum Sans, v3.112 to v3.113 (in no particular order):
+ - Cojoined Aring
+ - Some fixes in question mark
+
+Changelog of Argentum Sans, v3.114 (in no particular order):
+ - Imported question mark from Jones (https://github.com/indestructible-type/Jones/)
+ - Also, modified exclam to match the new default question mark
+ - Update copyright notes to include Montserrat Z Remix & Jones
+
+Changelog of Argentum Sans, v3.115 (in no particular order):
+ - Fixed some uncentered diacritics
+ - Reinstated proportional lining & old-style figures
+   (also respaced to match Roman)
+ - Some adjusts on Italic 'a'
+
+Changelog of Argentum Sans, v3.117 (in no particular order):
+ - Re-imported anchors from Montserrat in Italic
+ - Decomposed components in some Cyrillic glyphs
+ 
+ Changelog of Argentum Sans, v3.118 (in no particular order):
+ - Re-imported question mark from Montserrat, then modified it
+   and exclam
+ - Centered layer in periodcentered in Italic
+ - Some fixes in Greek
+ - Added centered colon for time display
+
+ Changelog of Argentum Sans, v3.119 to v3.120 (in no particular order):
+ - New peseta sign
+ - Fixed some off-center accents
+ - Fixed 'a' in Italic
+ 
+ Changelog of Argentum Sans, v3.121 to v3.122 (in no particular order):
+ - New '1'
+ - Fixed some more off-center accents
+
+ Changelog of Argentum Sans, v3.123 to v3.125 (in no particular order):
+ - Flattened height of old-style figures
+ - Equalized sidebearings of tabular old-style figures
+ - Imported '1' from Jones font
+
+ Changelog of Argentum Sans, v3.126 (in no particular order):
+ - New iota-grek
+ - New ampersand from https://github.com/TaniaChacana/Montserrat-Customization
+   As a result, old ampersand becomes ss06
+ - New, class-based true ligatures
+
+ Changelog of Argentum Sans, v3.127 (in no particular order):
+- New '5' and '7'
+- Fixed some more off-center diacritics
+- Fixed brevecyrcomb in Ucyr and ishortcyr
+- Fixed ampersand
+- Some more adjusts in Italic 'a'
+- Added double 'f' ligature in class-based ligatures
+
+ Changelog of Argentum Sans, v3.128 (in no particular order):
+- Re-added all Unicode support from U+1E00 to U+1E9B & U+1E9E
+- Some fixes in localized Cyrillic for Serbian & Bulgarian
+
+ Changelog of Argentum Sans, v3.129 (in no particular order):
+- New '3', '4', & '5'
+
+ Changelog of Argentum Sans, v3.132 (in no particular order):
+- New '5', tilde, & question mark
+
+ Changelog of Argentum Sans, v3.135 (in no particular order):
+- Implemented rvrn feature for some currencies
+- Some fixes in transformed components
+- Some fixes in Greek
+
+ Changelog of Argentum Sans, v3.200 (in no particular order):
+- Added width axis
+- New '1' and '5'
+
+ Changelog of Argentum Sans, v4.000 (in no particular order):
+- Finished width axis

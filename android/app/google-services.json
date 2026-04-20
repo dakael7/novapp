@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "507734879692",
+    "project_id": "mercanova-delivery",
+    "storage_bucket": "mercanova-delivery.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507734879692:android:5fd3f7090ee6a858380169",
+        "android_client_info": {
+          "package_name": "com.example.novapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "507734879692-b7fe6p4cn6bhjrq1u6l2tabegvni2sd9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHkonjWAYviw46p1bYfaNZ6faGvVcgVSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "507734879692-b7fe6p4cn6bhjrq1u6l2tabegvni2sd9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
