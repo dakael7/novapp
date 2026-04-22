@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/product.dart';
+import 'package:mercanova_go/product.dart';
 
 /// Modelo de datos para representar un producto dentro del carrito.
 class CartItem {
   final Product product;
-  final int quantity;
+  final double quantity;
 
-  CartItem({required this.product, this.quantity = 1});
+  CartItem({required this.product, this.quantity = 1.0});
 
-  CartItem copyWith({int? quantity}) {
+  CartItem copyWith({double? quantity}) {
     return CartItem(product: product, quantity: quantity ?? this.quantity);
   }
 }
@@ -19,16 +19,24 @@ class CartNotifier extends Notifier<Map<String, CartItem>> {
   Map<String, CartItem> build() => {};
 
   /// Agrega un producto al carrito o incrementa su cantidad si ya existe.
-  void addItem(Product product) {
+  void addItem(Product product, [double? amount]) {
+    // Si es por peso, incrementamos de a 100g (0.1), si no, de a 1 unidad.
+    final double step = product.isWeighted ? 0.1 : 1.0;
+    final double quantityToAdd = amount ?? step;
+
     if (state.containsKey(product.id)) {
+      final double newQuantity = state[product.id]!.quantity + quantityToAdd;
       state = {
         ...state,
         product.id: state[product.id]!.copyWith(
-          quantity: state[product.id]!.quantity + 1,
+          quantity: double.parse(newQuantity.toStringAsFixed(3)),
         ),
       };
     } else {
-      state = {...state, product.id: CartItem(product: product)};
+      state = {
+        ...state,
+        product.id: CartItem(product: product, quantity: quantityToAdd),
+      };
     }
   }
 
@@ -45,10 +53,15 @@ class CartNotifier extends Notifier<Map<String, CartItem>> {
     if (!state.containsKey(productId)) return;
 
     final currentItem = state[productId]!;
-    if (currentItem.quantity > 1) {
+    final double step = currentItem.product.isWeighted ? 0.1 : 1.0;
+
+    if (currentItem.quantity > step) {
+      final double newQuantity = currentItem.quantity - step;
       state = {
         ...state,
-        productId: currentItem.copyWith(quantity: currentItem.quantity - 1),
+        productId: currentItem.copyWith(
+          quantity: double.parse(newQuantity.toStringAsFixed(3)),
+        ),
       };
     } else {
       removeItem(productId);
@@ -61,8 +74,8 @@ class CartNotifier extends Notifier<Map<String, CartItem>> {
   }
 
   /// Calcula el número total de unidades en el carrito.
-  int get totalItems =>
-      state.values.fold(0, (sum, item) => sum + item.quantity);
+  double get totalItems =>
+      state.values.fold(0.0, (sum, item) => sum + item.quantity);
 
   /// Calcula el monto total a pagar en Dólares (USD).
   double get totalUsd => state.values.fold(

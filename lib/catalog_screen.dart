@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/branch_selection_screen.dart';
-import 'package:novapp/cart_provider.dart';
-import 'package:novapp/auth_repository.dart';
-import 'package:novapp/auth_screen.dart';
-import 'package:novapp/cart_screen.dart';
-import 'package:novapp/search_provider.dart';
-import 'package:novapp/search_results_screen.dart';
-import 'package:novapp/product_details_screen.dart';
-import 'package:novapp/product.dart';
-import 'package:novapp/product_repository.dart';
+import 'package:mercanova_go/cart_provider.dart';
+import 'package:mercanova_go/auth_repository.dart';
+import 'package:mercanova_go/auth_screen.dart';
+import 'package:mercanova_go/cart_screen.dart';
+import 'package:mercanova_go/search_provider.dart';
+import 'package:mercanova_go/search_results_screen.dart';
+import 'package:mercanova_go/product_details_screen.dart';
+import 'package:mercanova_go/product.dart';
+import 'package:mercanova_go/product_repository.dart';
+import 'package:mercanova_go/profile_screen.dart';
+import 'package:mercanova_go/product_list_screen.dart';
 
 class CatalogScreen extends ConsumerStatefulWidget {
   final String branchName;
@@ -40,16 +41,22 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final cartItems = ref.watch(cartProvider);
     final searchHistory = ref.watch(searchHistoryProvider);
     final featuredProducts = ref.watch(featuredProductsProvider);
+    final mercanovaOffers = ref.watch(mercanovaOffersProvider);
+    final promociones = ref.watch(promocionesProvider);
 
-    final totalItems = cartItems.values.fold(
-      0,
+    final double totalItems = cartItems.values.fold(
+      0.0,
       (sum, item) => sum + item.quantity,
     );
 
     return Scaffold(
       // Floating Action Button para el carrito (Neuromarketing: Zona de acción del pulgar)
       floatingActionButton: Badge(
-        label: Text('$totalItems'),
+        label: Text(
+          totalItems % 1 == 0
+              ? totalItems.toInt().toString()
+              : totalItems.toStringAsFixed(1),
+        ),
         isLabelVisible: totalItems > 0,
         alignment:
             Alignment.topLeft, // Posición superior izquierda como se solicitó
@@ -171,7 +178,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                               ],
                             ),
                             child: Text(
-                              '$totalItems',
+                              totalItems % 1 == 0
+                                  ? totalItems.toInt().toString()
+                                  : totalItems.toStringAsFixed(1),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13,
@@ -202,7 +211,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                       if (textEditingValue.text.isEmpty) {
                         return [
                           ...searchHistory,
-                          ...?featuredProducts.value?.map((p) => p.name),
+                          ...?featuredProducts.asData?.value.map((p) => p.name),
                         ];
                       }
                       // Búsqueda con soporte para coincidencias inexactas (Fuzzy Search)
@@ -376,100 +385,180 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 ),
               ),
 
-              // 3. Espacio Publicitario (Banner Dinámico)
+              // 3. Banner Publicitario de Partner (Kraft) - Proporción preservada
               SliverToBoxAdapter(
                 child: Container(
-                  height: 160,
                   margin: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEBE9F1),
                     borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(25),
-                          child: Image.network(
-                            'https://via.placeholder.com/600x300',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(color: Colors.black12),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withValues(alpha: 0.6),
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                        padding: const EdgeInsets.all(20),
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Ofertas de la Semana',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'Hasta 30% de descuento',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
                       ),
                     ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.asset(
+                      'assets/banner_partner.png',
+                      fit: BoxFit.fitWidth,
+                    ),
                   ),
                 ),
               ),
 
-              // 4. Sección: Nova Ofertas con fondo decorativo sutil
-              _buildSectionHeader(
-                'Nova Ofertas',
-                () {},
-                icon: Icons.local_fire_department_rounded,
-              ),
-              // 5. Sección: Productos Destacados
-              const SliverToBoxAdapter(child: SizedBox(height: 20)),
-              _buildSectionHeader(
-                'Productos Destacados',
-                () {},
-                icon: Icons.stars_rounded,
-              ),
-              featuredProducts.when(
-                data: (products) => SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 25,
-                          crossAxisSpacing: 20,
-                          childAspectRatio: 0.62,
+              // 4. Sección: Mercanova Ofertas (Horizontal)
+              mercanovaOffers.when(
+                data: (products) {
+                  if (products.isEmpty) {
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
+                  }
+                  return SliverMainAxisGroup(
+                    slivers: [
+                      _buildSectionHeader(
+                        'Mercanova Ofertas',
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductListScreen(
+                              title: 'Mercanova Ofertas',
+                              products: products,
+                            ),
+                          ),
                         ),
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final product = products[index];
-                      return _buildProductCard(
-                        product: product,
-                        headerColor: const Color(0xFFF27A1A),
-                        buttonColor: const Color(0xFF00823B),
-                      );
-                    }, childCount: products.length),
-                  ),
+                        icon: Icons.local_fire_department_rounded,
+                      ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 280,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: products.length > 8
+                                ? 8
+                                : products.length,
+                            itemBuilder: (context, index) {
+                              return _buildProductCard(
+                                product: products[index],
+                                headerColor: const Color(0xFF00823B),
+                                buttonColor: const Color(0xFFF27A1A),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                loading: () => const SliverToBoxAdapter(
+                  child: Center(child: CircularProgressIndicator()),
                 ),
+                error: (_, _) =>
+                    const SliverToBoxAdapter(child: SizedBox.shrink()),
+              ),
+
+              // 5. Sección: Promociones (Grid 4 items)
+              promociones.when(
+                data: (products) {
+                  if (products.isEmpty) {
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
+                  }
+                  final previewList = products.take(4).toList();
+                  return SliverMainAxisGroup(
+                    slivers: [
+                      _buildSectionHeader(
+                        'Promociones',
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductListScreen(
+                              title: 'Promociones',
+                              products: products,
+                            ),
+                          ),
+                        ),
+                        icon: Icons.sell_outlined,
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 25,
+                                crossAxisSpacing: 20,
+                                childAspectRatio: 0.62,
+                              ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildProductCard(
+                              product: previewList[index],
+                              headerColor: const Color(
+                                0xFF00823B,
+                              ), // Cambio a verde para Promociones
+                              buttonColor: const Color(0xFF00823B),
+                            ),
+                            childCount: previewList.length,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                loading: () =>
+                    const SliverToBoxAdapter(child: SizedBox.shrink()),
+                error: (_, _) =>
+                    const SliverToBoxAdapter(child: SizedBox.shrink()),
+              ),
+
+              // 6. Sección: Productos Destacados (Grid 6 items)
+              const SliverToBoxAdapter(child: SizedBox(height: 20)),
+              featuredProducts.when(
+                data: (products) {
+                  // Filtramos para que productos en oferta no se repitan en destacados
+                  final previewList = products
+                      .where((p) => p.offerType == null)
+                      .take(6)
+                      .toList();
+                  return SliverMainAxisGroup(
+                    slivers: [
+                      _buildSectionHeader(
+                        'Productos Destacados',
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductListScreen(
+                              title: 'Productos Destacados',
+                              products: products,
+                            ),
+                          ),
+                        ),
+                        icon: Icons.stars_rounded,
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 25,
+                                crossAxisSpacing: 20,
+                                childAspectRatio: 0.62,
+                              ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildProductCard(
+                              product: previewList[index],
+                              headerColor: const Color(0xFFF27A1A),
+                              buttonColor: const Color(0xFFF27A1A),
+                            ),
+                            childCount: previewList.length,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
                 loading: () => const SliverToBoxAdapter(
                   child: Center(child: CircularProgressIndicator()),
                 ),
@@ -529,6 +618,131 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     );
   }
 
+  /// Muestra un modal para seleccionar el gramaje de productos vendidos por peso.
+  void _showWeightPicker(BuildContext context, WidgetRef ref, Product product) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      elevation: 10,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      ),
+      builder: (context) {
+        double tempWeight = 0.1;
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    '¿Cuánto deseas llevar?',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    product.name,
+                    style: const TextStyle(color: Colors.black45, fontSize: 14),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        tempWeight < 1.0
+                            ? '${(tempWeight * 1000).toInt()} gr'
+                            : '${tempWeight.toStringAsFixed(2)} kg',
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFFF27A1A),
+                        ),
+                      ),
+                      if (tempWeight >= 1.0)
+                        Text(
+                          ' (${(tempWeight * 1000).toInt()} gr)',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black26,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Slider(
+                    value: tempWeight,
+                    min: 0.1,
+                    max: 2.0,
+                    divisions: 190,
+                    activeColor: const Color(0xFFF27A1A),
+                    inactiveColor: const Color(
+                      0xFFF27A1A,
+                    ).withValues(alpha: 0.1),
+                    onChanged: (value) {
+                      setModalState(() {
+                        tempWeight = double.parse(value.toStringAsFixed(2));
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 25),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        ref
+                            .read(cartProvider.notifier)
+                            .addItem(product, tempWeight);
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${product.name} (${tempWeight < 1.0 ? (tempWeight * 1000).toInt() : tempWeight} ${tempWeight < 1.0 ? 'gr' : 'kg'}) añadido',
+                            ),
+                            backgroundColor: const Color(0xFF00823B),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00823B),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        'Añadir al carrito',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   /// Widget de Tarjeta de Producto rediseñado para un look profesional.
   Widget _buildProductCard({
     required Product product,
@@ -541,8 +755,13 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final double refPrice = product.priceUsd;
     final String? brand = product.brand;
 
-    // Definición de gradientes dinámicos para evitar colores planos
-    final bool isHeaderGreen = headerColor == const Color(0xFF00823B);
+    // Lógica dinámica: Si es oferta o promoción, el cabezal SIEMPRE es verde
+    final bool hasOffer = product.offerType != null;
+    final Color effectiveHeaderColor = hasOffer
+        ? const Color(0xFF00823B)
+        : headerColor;
+
+    final bool isHeaderGreen = effectiveHeaderColor == const Color(0xFF00823B);
     final bool isButtonGreen = buttonColor == const Color(0xFF00823B);
 
     final Gradient headerGradient = LinearGradient(
@@ -600,57 +819,79 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                   topRight: Radius.circular(20),
                 ),
               ),
-              child: Column(
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Text(
-                    brand ?? 'MercaNova',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                  ),
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      letterSpacing: 0.5,
-                    ),
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(color: Colors.white),
-                      children: [
-                        const TextSpan(
-                          text: 'BS. ',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.normal,
-                          ),
+                  if (hasOffer)
+                    Positioned(
+                      top: -4,
+                      left: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
                         ),
-                        TextSpan(
-                          text: price.toStringAsFixed(2),
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: const Icon(
+                          Icons.percent_rounded,
+                          size: 14,
+                          color: Color(0xFF00823B),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  Text(
-                    'ref. ${refPrice.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 10,
-                    ),
+                  Column(
+                    children: [
+                      Text(
+                        brand ?? 'Mercanova Go',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                      ),
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      RichText(
+                        text: TextSpan(
+                          style: const TextStyle(color: Colors.white),
+                          children: [
+                            const TextSpan(
+                              text: 'BS. ',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: price.toStringAsFixed(2),
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        'ref. ${refPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -673,6 +914,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                       child: Hero(
                         tag: id,
                         child: Icon(
+                          // Corregido: withOpacity a withValues
                           Icons.inventory_2_outlined,
                           size: 65,
                           color: Colors.black.withValues(alpha: 0.05),
@@ -685,40 +927,23 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 Positioned(
                   bottom: 0, // Al raz del borde inferior
                   right: 0, // Al raz del borde derecho
-                  child: GestureDetector(
+                  child: _AnimatedAddButton(
                     onTap: () {
-                      ref.read(cartProvider.notifier).addItem(product);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('$name añadido'),
-                          duration: const Duration(seconds: 1),
-                          backgroundColor: const Color(0xFF00823B),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      height: 44,
-                      width: 44,
-                      decoration: BoxDecoration(
-                        gradient: buttonGradient,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          bottomRight: Radius.circular(20),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: buttonColor.withValues(alpha: 0.4),
-                            blurRadius: 10,
-                            offset: const Offset(-2, -2),
+                      if (product.isWeighted) {
+                        _showWeightPicker(context, ref, product);
+                      } else {
+                        ref.read(cartProvider.notifier).addItem(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('$name añadido'),
+                            duration: const Duration(seconds: 1),
+                            backgroundColor: const Color(0xFF00823B),
                           ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
+                        );
+                      }
+                    },
+                    gradient: buttonGradient,
+                    shadowColor: buttonColor.withValues(alpha: 0.4),
                   ),
                 ),
               ],
@@ -729,7 +954,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     );
   }
 
-  /// Construye el menú lateral (Sidebar/Drawer) con la identidad de MercaNova.
+  /// Construye el menú lateral (Sidebar/Drawer) con la identidad de Mercanova Go.
   Widget _buildSidebar(BuildContext context) {
     return Drawer(
       backgroundColor: Colors.white,
@@ -759,7 +984,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     Image.asset('assets/logo.png', height: 50),
                     const SizedBox(width: 12),
                     const Text(
-                      'Novapp',
+                      'Mercanova Go',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -795,7 +1020,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
           _buildSidebarItem(
             icon: Icons.person_outline_rounded,
             label: 'Perfil',
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
           ),
           _buildSidebarItem(
             icon: Icons.shopping_bag_outlined,
@@ -806,18 +1035,6 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
             icon: Icons.info_outline_rounded,
             label: 'Acerca de',
             onTap: () {},
-          ),
-          const Divider(indent: 20, endIndent: 20, height: 30),
-          _buildSidebarItem(
-            icon: Icons.swap_horiz_rounded,
-            label: 'Cambiar sede',
-            onTap: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const BranchSelectionScreen(),
-                ),
-              );
-            },
           ),
           const Divider(indent: 20, endIndent: 20, height: 30),
           _buildSidebarItem(
@@ -904,4 +1121,139 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     }
     return v1[t.length];
   }
+}
+
+/// Widget personalizado que encapsula el botón "+" con una animación de "explosión de partículas".
+class _AnimatedAddButton extends StatefulWidget {
+  final VoidCallback onTap;
+  final Gradient gradient;
+  final Color shadowColor;
+
+  const _AnimatedAddButton({
+    required this.onTap,
+    required this.gradient,
+    required this.shadowColor,
+  });
+
+  @override
+  State<_AnimatedAddButton> createState() => _AnimatedAddButtonState();
+}
+
+class _AnimatedAddButtonState extends State<_AnimatedAddButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    _controller.forward(from: 0.0);
+    widget.onTap();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _handleTap,
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // Capa de partículas (Explosión de gotitas)
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: _ParticlePainter(
+                  progress: _animation.value,
+                  color: const Color(0xFF00823B), // El color verde solicitado
+                ),
+              );
+            },
+          ),
+          // Botón Base
+          Container(
+            height: 44,
+            width: 44,
+            decoration: BoxDecoration(
+              gradient: widget.gradient,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: widget.shadowColor,
+                  blurRadius: 10,
+                  offset: const Offset(-2, -2),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pintor encargado de dibujar las pequeñas gotas volando.
+class _ParticlePainter extends CustomPainter {
+  final double progress;
+  final Color color;
+
+  _ParticlePainter({required this.progress, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (progress == 0 || progress == 1) return;
+
+    final paint = Paint()
+      ..color = color.withValues(alpha: (1 - progress).clamp(0, 1))
+      ..style = PaintingStyle.fill;
+
+    const int count = 16; // Más partículas para un efecto más denso
+    const double gravity =
+        80.0; // Gravedad un poco más marcada para el efecto de caída
+
+    for (int i = 0; i < count; i++) {
+      // Distribución uniforme en círculo (fuego artificial)
+      double angle = (i * (360 / count)) * (3.14159 / 180);
+
+      // Velocidad aumentada para mayor alcance de dispersión
+      double velocity = 40 + (i * 15 % 40);
+
+      // Movimiento radial (explosión)
+      double radialDistance = progress * velocity;
+      Offset explosionDir = Offset.fromDirection(angle, radialDistance);
+
+      // Efecto de caída parabólica por gravedad (y = 0.5 * g * t^2)
+      double drop = 0.5 * gravity * progress * progress;
+
+      // Posición final combinada
+      Offset finalPos = Offset(explosionDir.dx, explosionDir.dy + drop);
+
+      canvas.drawCircle(finalPos, 5.0 * (1 - progress), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_ParticlePainter oldDelegate) => true;
 }

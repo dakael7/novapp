@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:novapp/order_repository.dart';
-import 'package:novapp/product_repository.dart';
-import 'package:novapp/auth_repository.dart';
-import 'package:novapp/profile_repository.dart';
-import 'package:novapp/cart_provider.dart';
-import 'package:novapp/catalog_screen.dart'; // Importar CatalogScreen para la navegación
+import 'package:mercanova_go/order_repository.dart';
+import 'package:mercanova_go/product_repository.dart';
+import 'package:mercanova_go/auth_repository.dart';
+import 'package:mercanova_go/profile_repository.dart';
+import 'package:mercanova_go/cart_provider.dart';
+import 'package:mercanova_go/catalog_screen.dart'; // Importar CatalogScreen para la navegación
 
 /// Pantalla de Checkout para selección de ubicación y envío a WhatsApp.
 class CheckoutScreen extends ConsumerStatefulWidget {

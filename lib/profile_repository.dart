@@ -18,6 +18,8 @@ class ProfileRepository {
     required String name,
     required String idNumber, // Cédula o ID
     required String phoneNumber,
+    required String municipio,
+    required String sector,
   }) async {
     try {
       await _firestore.collection('user_profiles').doc(userId).set({
@@ -25,12 +27,30 @@ class ProfileRepository {
         'name': name,
         'id_number': idNumber,
         'phone_number': phoneNumber,
+        'municipio': municipio,
+        'sector': sector,
         'created_at': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       throw Exception(
         'Error al guardar el perfil del usuario en Firestore: $e',
       );
+    }
+  }
+
+  /// Actualiza únicamente la dirección del usuario.
+  Future<void> updateProfileAddress({
+    required String userId,
+    required String municipio,
+    required String sector,
+  }) async {
+    try {
+      await _firestore.collection('user_profiles').doc(userId).update({
+        'municipio': municipio,
+        'sector': sector,
+      });
+    } catch (e) {
+      throw Exception('Error al actualizar la dirección en Firestore: $e');
     }
   }
 

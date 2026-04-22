@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:novapp/catalog_screen.dart';
+import 'package:mercanova_go/catalog_screen.dart';
 
 /// Pantalla de selección de sucursal con estética de Onboarding.
 /// Permite segmentar el inventario entre Maracay y Palo Negro.

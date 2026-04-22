@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/auth_repository.dart';
-import 'package:novapp/branch_selection_screen.dart';
-import 'package:novapp/profile_repository.dart';
-import 'package:novapp/onboarding_screen.dart';
+import 'package:mercanova_go/auth_repository.dart';
+import 'package:mercanova_go/profile_repository.dart';
+import 'package:mercanova_go/catalog_screen.dart';
+import 'package:mercanova_go/onboarding_screen.dart';
 
 /// Pantalla de carga inicial (Splash Screen) que presenta la identidad de la marca.
 /// Ahora valida la persistencia de la sesión de Firebase para dirigir al usuario.
@@ -37,25 +37,35 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     // 1. Verificamos sesión activa en Firebase
     final user = ref.read(authRepositoryProvider).currentUser;
-    bool profileComplete = false;
+    Map<String, dynamic>? profile;
 
     // 2. Si hay usuario, verificamos que tenga su perfil registrado en Supabase
     if (user != null) {
-      final profile = await ref
-          .read(profileRepositoryProvider)
-          .getProfile(user.uid);
-      profileComplete = profile != null;
+      profile = await ref.read(profileRepositoryProvider).getProfile(user.uid);
     }
 
     // Verificamos que el widget siga montado después de las llamadas asíncronas antes de navegar.
     if (!mounted) return;
 
     // 3. Lógica de ruteo:
-    // - Si tiene sesión y perfil completo -> Catálogo.
+    // - Si tiene sesión y perfil completo -> Calcula sede y va a Catálogo.
     // - En cualquier otro caso -> Onboarding (que llevará al AuthScreen).
-    final Widget targetScreen = (user != null && profileComplete)
-        ? const BranchSelectionScreen()
-        : const OnboardingScreen();
+    Widget targetScreen;
+
+    if (user != null && profile != null) {
+      final municipio = profile['municipio'] ?? 'Girardot';
+
+      // Lógica de asignación de sede automática
+      String branch =
+          (municipio == 'Libertador' ||
+              municipio == 'Francisco Linares Alcántara')
+          ? 'Mercanova 22'
+          : 'Mercanova Express';
+
+      targetScreen = CatalogScreen(branchName: branch);
+    } else {
+      targetScreen = const OnboardingScreen();
+    }
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -80,7 +90,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       backgroundColor: Colors.white, // Fondo limpio según el manual de estilo
       body: Stack(
         children: [
-          // Decoración superior derecha (Amarillo MercaNova)
+          // Decoración superior derecha (Amarillo Mercanova Go)
           Positioned(
             top: -40,
             right: -40,
@@ -102,7 +112,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo principal de MercaNova Delivery con un ligero delay de entrada
+                // Logo principal de Mercanova Go con un ligero delay de entrada
                 Image.asset('assets/logo.png', width: 220, fit: BoxFit.contain),
               ],
             ),

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:novapp/firebase_options.dart'; // Importa las opciones generadas
-import 'package:novapp/splash_screen.dart';
+import 'package:mercanova_go/firebase_options.dart'; // Importa las opciones generadas
+import 'package:mercanova_go/splash_screen.dart';
 
-/// Punto de entrada principal de la aplicación MercaNova Delivery.
+/// Punto de entrada principal de la aplicación Mercanova Go.
 /// Se utiliza [ProviderScope] para habilitar el manejo de estado con Riverpod
 /// según la arquitectura definida en el contexto del proyecto.
 Future<void> main() async {
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MercaNova Delivery',
+      title: 'Mercanova Go',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

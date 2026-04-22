@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/branch_selection_screen.dart';
-import 'package:novapp/auth_repository.dart';
-import 'package:novapp/profile_repository.dart'; // Importamos el nuevo repositorio
+import 'package:mercanova_go/catalog_screen.dart';
+import 'package:mercanova_go/auth_repository.dart';
+import 'package:mercanova_go/profile_repository.dart'; // Importamos el nuevo repositorio
 
 /// Define los estados lógicos del flujo de autenticación dinámico.
 /// completeProfile se utiliza para capturar datos adicionales en registros OAuth.
@@ -30,6 +30,53 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final TextEditingController _phoneController =
       TextEditingController(); // Nuevo controlador para el teléfono
   final TextEditingController _idController = TextEditingController();
+
+  // Estados para la ubicación dinámica (Dirección)
+  String? _selectedMunicipio;
+  String? _selectedSector;
+
+  final Map<String, List<String>> _municipiosSectors = {
+    'Girardot': [
+      'El Castaño',
+      'La Soledad',
+      'Calicanto',
+      'San Jacinto',
+      'Base Aragua',
+      'San Isidro',
+      'La Floresta',
+      'El Bosque',
+      'Las Acacias',
+      'Piñonal',
+      'San José',
+      'La Maracaya',
+      'la Coromoto',
+      'san Vicente',
+      '23 de Enero',
+      'Los Olivos',
+    ],
+    'Libertador': [
+      'La Ovallera',
+      'Los Hornos',
+      'Barrio Libertad',
+      'La Pica',
+      'Santa Ana',
+      'El Cortijo',
+      'Urbanización Bael',
+      'Residencias El Parque',
+      'San José de la Caridad',
+      'Las Ánimas',
+      'Ocumarito',
+      'la Esmeraldita',
+      'Palo Negro',
+    ],
+    'Francisco Linares Alcántara': [
+      'Santa Rita',
+      'Coropo',
+      'Paraparal',
+      'La Morita',
+      'Francisco de Miranda',
+    ],
+  };
 
   @override
   void initState() {
@@ -107,6 +154,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final String phoneBody = _phoneController.text.trim();
     final String password = _passwordController.text;
 
+    // Validación de dirección obligatoria
+    if (_selectedMunicipio == null || _selectedSector == null) {
+      _showError('Por favor, selecciona tu municipio y sector.');
+      setState(() => _isLoading = false);
+      return;
+    }
+
     // 1. Validar y Formatear Nombre (mínimo 2 palabras)
     final words = nameInput
         .split(RegExp(r'\s+'))
@@ -177,10 +231,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               name: formattedName,
               idNumber: fullId,
               phoneNumber: fullPhone,
+              municipio: _selectedMunicipio!,
+              sector: _selectedSector!,
             );
       }
 
-      _navigateToCatalog();
+      await _navigateToCatalog();
     } catch (e) {
       _showError('Error al registrarse: $e');
     } finally {
@@ -212,7 +268,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           setState(() => _currentStep = AuthStep.completeProfile);
         } else {
           // Si ya existe, entra directo
-          _navigateToCatalog();
+          await _navigateToCatalog();
         }
       }
     } catch (e) {
@@ -230,10 +286,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   /// Navegación centralizada hacia la pantalla de catálogo.
-  void _navigateToCatalog() {
+  Future<void> _navigateToCatalog() async {
     if (!mounted) return;
+
+    final user = ref.read(authRepositoryProvider).currentUser;
+    if (user == null) return;
+
+    // Obtenemos el perfil para determinar la sede automáticamente
+    final profile = await ref
+        .read(profileRepositoryProvider)
+        .getProfile(user.uid);
+
+    if (!mounted) return;
+
+    final municipio = profile?['municipio'] ?? 'Girardot';
+    final branch =
+        (municipio == 'Libertador' ||
+            municipio == 'Francisco Linares Alcántara')
+        ? 'Mercanova 22'
+        : 'Mercanova Express';
+
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const BranchSelectionScreen()),
+      MaterialPageRoute(
+        builder: (context) => CatalogScreen(branchName: branch),
+      ),
     );
   }
 
@@ -447,6 +523,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 15),
+            _buildDropdownField(
+              label: 'Municipio',
+              icon: Icons.location_city_outlined,
+              value: _selectedMunicipio,
+              items: _municipiosSectors.keys.toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedMunicipio = val;
+                  _selectedSector =
+                      null; // Reiniciar sector al cambiar municipio
+                });
+              },
+            ),
+            if (_selectedMunicipio != null) ...[
+              const SizedBox(height: 15),
+              _buildDropdownField(
+                label: 'Sector',
+                icon: Icons.map_outlined,
+                value: _selectedSector,
+                items: _municipiosSectors[_selectedMunicipio!]!,
+                onChanged: (val) => setState(() => _selectedSector = val),
+              ),
+            ],
+            const SizedBox(height: 15),
             _buildTextField(
               controller: _passwordController,
               label: 'Crea tu contraseña',
@@ -505,6 +605,29 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               onChanged: (val) => setState(() => _selectedPhonePrefix = val!),
               keyboardType: TextInputType.phone,
             ),
+            const SizedBox(height: 15),
+            _buildDropdownField(
+              label: 'Municipio',
+              icon: Icons.location_city_outlined,
+              value: _selectedMunicipio,
+              items: _municipiosSectors.keys.toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedMunicipio = val;
+                  _selectedSector = null;
+                });
+              },
+            ),
+            if (_selectedMunicipio != null) ...[
+              const SizedBox(height: 15),
+              _buildDropdownField(
+                label: 'Sector',
+                icon: Icons.map_outlined,
+                value: _selectedSector,
+                items: _municipiosSectors[_selectedMunicipio!]!,
+                onChanged: (val) => setState(() => _selectedSector = val),
+              ),
+            ],
             const SizedBox(height: 25),
             _buildPrimaryButton(
               text: 'Finalizar Registro',
@@ -540,6 +663,52 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           borderRadius: BorderRadius.circular(40),
           borderSide: const BorderSide(color: Colors.black12),
         ),
+      ),
+    );
+  }
+
+  /// Campo de selección desplegable (Dropdown) estilizado según el diseño de Mercanova Go.
+  Widget _buildDropdownField({
+    required String label,
+    required IconData icon,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F6F8),
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(color: Colors.black12),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.black38),
+          const SizedBox(width: 12),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: value,
+                isExpanded: true,
+                hint: Text(
+                  label,
+                  style: const TextStyle(color: Colors.black38, fontSize: 16),
+                ),
+                onChanged: onChanged,
+                items: items.map((String item) {
+                  return DropdownMenuItem<String>(
+                    value: item,
+                    child: Text(
+                      item,
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/cart_provider.dart';
-import 'package:novapp/checkout_screen.dart';
+import 'package:mercanova_go/cart_provider.dart';
+import 'package:mercanova_go/checkout_screen.dart';
 
 /// Pantalla de Carrito de Compras diseñada con el estilo premium de MercaNova.
 class CartScreen extends ConsumerWidget {

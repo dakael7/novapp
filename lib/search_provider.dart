@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/product_repository.dart';
-import 'package:novapp/product.dart';
+import 'package:mercanova_go/product_repository.dart';
+import 'package:mercanova_go/product.dart';
 
 /// Notificador para gestionar el historial de búsqueda real en memoria.
 /// En una fase posterior, esto puede integrarse con SharedPreferences para persistencia local.

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:novapp/price_calculator.dart';
+import 'package:mercanova_go/price_calculator.dart';
 
 /// Modelo de datos inmutable para un Producto de MercaNova.
 /// Mapeado directamente desde la tabla MA_PRODUCTOS_MIRROR.
@@ -15,6 +15,12 @@ class Product {
   final String? imageUrl;
   final String category;
   final bool isFeatured;
+  final String? offerType; // 'oferta', 'promocion' o null
+  final double taxPercent; // Porcentaje de impuesto para recálculos
+  final String unit; // 'Kg', 'Und', etc.
+
+  /// Indica si el producto se vende por peso (gramaje) en lugar de unidades.
+  bool get isWeighted => unit.trim().toLowerCase() == 'kg';
 
   const Product({
     required this.id,
@@ -27,14 +33,45 @@ class Product {
     this.imageUrl,
     required this.category,
     this.isFeatured = false,
+    this.offerType,
+    required this.taxPercent,
+    required this.unit,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json, double exchangeRate) {
+  Product copyWith({
+    String? offerType,
+    double? priceBs,
+    double? priceUsd,
+    String? unit,
+  }) {
+    return Product(
+      id: id,
+      code: code,
+      name: name,
+      brand: brand,
+      description: description,
+      priceBs: priceBs ?? this.priceBs,
+      priceUsd: priceUsd ?? this.priceUsd,
+      imageUrl: imageUrl,
+      category: category,
+      isFeatured: isFeatured,
+      offerType: offerType ?? this.offerType,
+      taxPercent: taxPercent,
+      unit: unit ?? this.unit,
+    );
+  }
+
+  factory Product.fromJson(
+    Map<String, dynamic> json,
+    double exchangeRate, {
+    double? overrideBasePrice,
+  }) {
     // Función auxiliar para manejar el case-sensitivity de PostgreSQL/Supabase
     T? getValue<T>(String key) => (json[key] ?? json[key.toLowerCase()]) as T?;
 
     // 1. Obtención de valores base (n_Precio1 es la base imponible en USD)
-    final double basePrice = (getValue<num>('n_Precio1') ?? 0).toDouble();
+    final double basePrice =
+        overrideBasePrice ?? (getValue<num>('n_Precio1') ?? 0).toDouble();
     final double taxPercent = (getValue<num>('n_Impuesto1') ?? 0).toDouble();
 
     // Se delega el cálculo a la clase modular PriceCalculator para facilitar cambios futuros.
@@ -60,6 +97,8 @@ class Product {
       imageUrl: getValue<String>('c_FileImagen'),
       category: 'General',
       isFeatured: (json['n_Activo'] ?? 0) == 1,
+      taxPercent: taxPercent,
+      unit: getValue<String>('c_Presenta') ?? 'Und',
     );
   }
 }

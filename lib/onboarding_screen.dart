@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:novapp/auth_screen.dart';
-import 'package:novapp/onboarding_body.dart';
+import 'package:mercanova_go/auth_screen.dart';
+import 'package:mercanova_go/onboarding_body.dart';
 
 /// Pantalla de Onboarding que gestiona el carrusel de bienvenida.
 /// Implementa un [PageView] con 3 secciones informativas siguiendo el diseño minimalista.

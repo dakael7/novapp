@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/supabase_provider.dart';
+import 'package:mercanova_go/supabase_provider.dart';
 
 /// Repositorio encargado de registrar las transacciones en la tabla ma_pedidos_core.
 class OrderRepository {

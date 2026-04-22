@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:novapp/cart_provider.dart';
-import 'package:novapp/product.dart';
+import 'package:mercanova_go/cart_provider.dart';
+import 'package:mercanova_go/product.dart';
 
 /// Pantalla de detalle de producto con diseño premium y funcional.
 class ProductDetailsScreen extends StatefulWidget {
